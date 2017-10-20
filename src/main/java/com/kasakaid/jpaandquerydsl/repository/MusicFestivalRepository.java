@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-import java.beans.Expression;
 import java.util.List;
 
 @Repository
@@ -34,7 +33,7 @@ public class MusicFestivalRepository {
         JPAQueryFactory qFactory = new JPAQueryFactory(em);
         // JPA で OneToMany と ManyToOne の関係が結ばれた列は on に入れると、エラーになる。
         // 関連性のない項目を連結させる。
-        return qFactory.selectFrom(musicFestival)
+        return qFactory.selectDistinct(musicFestival).from(musicFestival)
                 .innerJoin(musicFestival.artists, a)
                 .on(musicFestival.id.eq(Expressions.asNumber(1))).fetch();
     }
