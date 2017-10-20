@@ -27,6 +27,7 @@ public class Config {
     private Environment environment;
     @Bean
     public DataSource dataSource() {
+        environment.acceptsProfiles("test");
         EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
         builder.setType(EmbeddedDatabaseType.H2);
         DriverManagerDataSource dataSource = new DriverManagerDataSource();

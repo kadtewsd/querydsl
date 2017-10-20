@@ -28,6 +28,6 @@ public class MusicFestival {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "musicFestival")
     @Getter
     @Setter
-    @OrderBy("playOrder ASC")
+    @OrderBy("id ASC")
     private List<Artist> artists;
 }
