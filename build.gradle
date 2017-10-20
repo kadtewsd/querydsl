@@ -1,0 +1,77 @@
+buildscript {
+  ext {
+    springBootVersion = "1.5.4.RELEASE"
+  }
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+      classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+  }
+}
+
+apply plugin: "java"
+apply plugin: "org.springframework.boot"
+
+description = "This is my first SpringBoot"
+version = "0.0.1-SNAPSHOT"
+sourceCompatibility = 1.8
+
+repositories {
+  mavenCentral()
+}
+dependencies {
+
+    compile('com.querydsl:querydsl-apt:4.1.4')
+    compile('com.querydsl:querydsl-sql:4.1.4')
+    compile('com.querydsl:querydsl-sql-spring:4.1.4')
+    compile('com.querydsl:querydsl-jpa:4.1.4')
+
+    compile ('org.springframework:spring-jdbc:4.3.6.RELEASE')
+    compile('org.springframework.boot:spring-boot-starter-aop')
+
+    testCompile('org.dbunit:dbunit:2.5.1')
+    compile('org.springframework.boot:spring-boot-starter')
+    compile("org.springframework.boot:spring-boot-starter-web")
+
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    runtime('com.h2database:h2')
+    runtime('mysql:mysql-connector-java')
+    compile('org.projectlombok:lombok')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+
+}
+
+sourceSets {
+    generated
+}
+sourceSets.generated.java.srcDirs = ['build/classes/main']
+configurations {
+    querydslapt
+}
+
+/**** QueryDSL Class Generate Script to avoid lombok error ****/
+def queryDslOutput = file("src/main/generated")
+sourceSets {
+    main {
+        java {
+            srcDir queryDslOutput
+        }
+    }
+}
+
+task generateQueryDSL(type: JavaCompile, group: 'build') {
+    source = sourceSets.main.java
+    classpath = configurations.compile
+    destinationDir = queryDslOutput
+    options.compilerArgs = [
+            "-proc:only",
+            "-processor", 'com.querydsl.apt.jpa.JPAAnnotationProcessor,lombok.launch.AnnotationProcessorHider$AnnotationProcessor'
+    ]
+}
+compileJava.dependsOn(generateQueryDSL)
+
+clean {
+    delete queryDslOutput
+}
