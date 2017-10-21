@@ -9,12 +9,13 @@ import java.util.List;
 
 @NoArgsConstructor
 @Entity
+@Table(name = "music_festival")
 @AllArgsConstructor
 @Builder(builderMethodName = "of")
 public class MusicFestival {
     @Id
     @Getter
-    private Long id;
+    private int id;
 
     @Getter
     private String name;

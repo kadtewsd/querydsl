@@ -13,25 +13,25 @@ import java.io.Serializable;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Getter
-@DiscriminatorColumn(name = "artistType")
+//@DiscriminatorColumn(name = "artistType")
 public abstract class Artist implements Serializable {
 
-    Artist(long id, String name) {
+    Artist(int id, String name) {
         this.id = id;
         this.artistName = name;
     }
 
     @Id
-    private long id;
+    private int id;
 
     private String artistName;
 
-    private Genre genre;
+//    @Enumerated(EnumType.STRING)
+//    private Genre genre;
 
-    @Column(insertable = false, updatable = false)
-    private String artistType;
+//    private String artistType;
 
     @ManyToOne
-    @JoinColumn(name = "festivalId", insertable = false, updatable = false)
+    @JoinColumn(name = "festival_Id", insertable = false, updatable = false)
     private MusicFestival musicFestival;
 }

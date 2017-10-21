@@ -12,11 +12,11 @@ import javax.persistence.Enumerated;
 @Getter
 public class Solo extends Artist {
 
-    @Enumerated(EnumType.STRING)
-    private Sex sex;
-    public Solo (long id, String name, Sex sex) {
+//    @Enumerated(EnumType.STRING)
+//    private Sex sex;
+    public Solo (int id, String name, Sex sex) {
         super(id, name);
-        this.sex = sex;
+//        this.sex = sex;
     }
 
 }
