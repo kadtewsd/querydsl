@@ -7,22 +7,24 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Getter
-//@DiscriminatorColumn(name = "artistType")
-public abstract class Artist implements Serializable {
+public class Artist implements Serializable {
 
-    Artist(int id, String name) {
-        this.id = id;
+    Artist(int artistId, String name) {
+        this.artistId = artistId;
         this.artistName = name;
     }
 
+    // SqlQueryFactory では列名がかぶると SQL の重複エラーになる
     @Id
-    private int id;
+    private int artistId;
+
+    private int festivalId;
 
     private String artistName;
 
@@ -32,6 +34,10 @@ public abstract class Artist implements Serializable {
 //    private String artistType;
 
     @ManyToOne
-    @JoinColumn(name = "festival_Id", insertable = false, updatable = false)
+    @JoinColumn(name = "festivalId", insertable = false, updatable = false)
     private MusicFestival musicFestival;
+
+    @OneToMany(mappedBy = "artist")
+    private Set<MemberInformation> members;
+
 }

@@ -22,13 +22,13 @@ public class QArtist extends EntityPathBase<Artist> {
 
     public static final QArtist artist = new QArtist("artist");
 
+    public final NumberPath<Integer> artistId = createNumber("artistId", Integer.class);
+
     public final StringPath artistName = createString("artistName");
 
-    public final StringPath artistType = createString("artistType");
+    public final NumberPath<Integer> festivalId = createNumber("festivalId", Integer.class);
 
-    public final QGenre genre;
-
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final SetPath<MemberInformation, QMemberInformation> members = this.<MemberInformation, QMemberInformation>createSet("members", MemberInformation.class, QMemberInformation.class, PathInits.DIRECT2);
 
     public final com.kasakaid.jpaandquerydsl.domain.QMusicFestival musicFestival;
 
@@ -50,7 +50,6 @@ public class QArtist extends EntityPathBase<Artist> {
 
     public QArtist(Class<? extends Artist> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.genre = inits.isInitialized("genre") ? new QGenre(forProperty("genre")) : null;
         this.musicFestival = inits.isInitialized("musicFestival") ? new com.kasakaid.jpaandquerydsl.domain.QMusicFestival(forProperty("musicFestival")) : null;
     }
 

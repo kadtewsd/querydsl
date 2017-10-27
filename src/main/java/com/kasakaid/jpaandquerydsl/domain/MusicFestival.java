@@ -14,10 +14,10 @@ import java.util.List;
 public class MusicFestival {
     @Id
     @Getter
-    private int id;
+    private int festivalId;
 
     @Getter
-    private String name;
+    private String festivalName;
 
     @Getter
     private String place;
@@ -28,6 +28,6 @@ public class MusicFestival {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "musicFestival")
     @Getter
     @Setter
-    @OrderBy("id ASC")
+    @OrderBy("festivalId ASC")
     private List<Artist> artists;
 }

@@ -24,9 +24,9 @@ public class QMusicFestival extends EntityPathBase<MusicFestival> {
 
     public final DatePath<java.time.LocalDate> eventDate = createDate("eventDate", java.time.LocalDate.class);
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final NumberPath<Integer> festivalId = createNumber("festivalId", Integer.class);
 
-    public final StringPath name = createString("name");
+    public final StringPath festivalName = createString("festivalName");
 
     public final StringPath place = createString("place");
 
