@@ -40,10 +40,6 @@ public class Config {
     private ApplicationContext context;
     @Bean
     public DataSource dataSource() {
-        if (("jdbc:log4jdbc:h2:mem:test;MODE=MySQL;DB_CLOSE_ON_EXIT=FALSE").equals(
-                environment.getProperty("spring.datasource.url"))) {
-            return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
-        }
 
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName(environment.getProperty("spring.datasource.driver-class-name"));
@@ -58,11 +54,6 @@ public class Config {
         JdbcTemplate template = new JdbcTemplate();
         template.setDataSource(dataSource());
         return template;
-    }
-
-    @Bean
-    public PlatformTransactionManager transactionManager() {
-        return new DataSourceTransactionManager(dataSource());
     }
 
     @Bean

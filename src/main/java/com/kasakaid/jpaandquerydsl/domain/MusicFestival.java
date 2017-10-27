@@ -9,7 +9,6 @@ import java.util.List;
 
 @NoArgsConstructor
 @Entity
-@Table(name = "music_festival")
 @AllArgsConstructor
 @Builder(builderMethodName = "of")
 public class MusicFestival {

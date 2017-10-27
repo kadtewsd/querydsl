@@ -2,6 +2,7 @@ package com.kasakaid.jpaandquerydsl.repository;
 
 import com.kasakaid.jpaandquerydsl.Application;
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
+import com.kasakaid.jpaandquerydsl.spring.TestConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,7 +16,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-@SpringBootTest(classes = {Application.class})
+@SpringBootTest(classes = {Application.class, TestConfig.class})
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
 public class MusicFestivalRepositoryTest {
@@ -43,5 +44,7 @@ public class MusicFestivalRepositoryTest {
         assertThat(list.size(), is(0));
         List<MusicFestival> list0 = repository.findMusicFestival();
         assertThat(list0.size(), is(0));
+        List<MusicFestival> list1 = repository.findMusicFestivalWhereJoin();
+        assertThat(list1.size(), is(0));
     }
 }
