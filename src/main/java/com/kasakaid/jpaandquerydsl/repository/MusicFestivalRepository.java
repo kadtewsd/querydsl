@@ -21,6 +21,8 @@ import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.util.List;
 
+// リポジトリを直接コールすると例外が発生する。あえて、@Transactional をつける。
+// @Service のクラスだけにアノテーションをつけてもでトランザクションが開始することは確認できた。
 @Transactional
 @Repository
 @RequiredArgsConstructor
