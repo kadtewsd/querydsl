@@ -2,15 +2,17 @@ package com.kasakaid.jpaandquerydsl.domain.artist;
 
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
 @NoArgsConstructor
-@Data
+@Getter
 public class Artist implements Serializable {
 
     // SqlQueryFactory では列名がかぶると SQL の重複エラーになる
@@ -22,17 +24,23 @@ public class Artist implements Serializable {
     private String artistName;
 
     @QueryProjection
-    public Artist(int artistId, int festivalId, String artistName) {
+    public Artist(int festivalId, int artistId, String artistName) {
         this.artistId = artistId;
         this.festivalId = festivalId;
         this.artistName = artistName;
     }
-    public Artist(int artistId, int festivalId, String artistName, MusicFestival musicFestival, Set<MemberInformation> memberInformation) {
+    @QueryProjection
+    public Artist(int festivalId, int artistId, String artistName, MemberInformation memberInformation) {
         this.artistId = artistId;
         this.festivalId = festivalId;
         this.artistName = artistName;
-        this.musicFestival = musicFestival;
-        this.members = memberInformation;
+        this.members = new LinkedHashSet<>();
+        this.members.add(memberInformation);
+    }
+
+    public Artist(MemberInformation memberInformation) {
+        this.members = new LinkedHashSet<>();
+        members.add(memberInformation);
     }
 
 //    @Enumerated(EnumType.STRING)
@@ -44,7 +52,7 @@ public class Artist implements Serializable {
     @JoinColumn(name = "festivalId", insertable = false, updatable = false)
     private MusicFestival musicFestival;
 
-    @OneToMany(mappedBy = "artist")
+    @OneToMany(mappedBy = "artist",fetch = FetchType.EAGER)
     private Set<MemberInformation> members;
 
 }

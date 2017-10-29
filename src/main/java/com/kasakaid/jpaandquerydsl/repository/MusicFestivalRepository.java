@@ -8,8 +8,7 @@ import com.kasakaid.jpaandquerydsl.domain.artist.QArtist;
 import com.kasakaid.jpaandquerydsl.domain.artist.QMemberInformation;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.group.GroupBy;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.QBean;
+import com.querydsl.core.types.*;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.sql.SQLQueryFactory;
@@ -21,7 +20,6 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -42,82 +40,54 @@ public class MusicFestivalRepository {
 
     public List<MusicFestival> findMusicFestival() {
         log.info("left join");
-        // SQLQueryFactory だと列名を指定する必要がある。
-
-        QBean<MemberInformation> memberInformationBean = Projections.bean(MemberInformation.class,
-                m.memberId,
-                m.artistId,
-                m.memberName,
-                m.instrumental
-        );
-
-        QBean<Artist> artistBean = Projections.bean(Artist.class,
-                        a.artistId,
-                        a.festivalId,
-                        a.artistName,
-                GroupBy.set(memberInformationBean).as("member")
-        );
-        QBean<MusicFestival> bean = Projections.bean(MusicFestival.class,
-                mf.festivalId,
-                mf.festivalName,
-                mf.eventDate,
-                mf.place,
-                Projections.bean(Artist.class,
-                        a.artistId.as("artists.artistId"),
-                        a.festivalId,
-                        a.artistName
-                ).as("artistsR"),
-                m.memberId.as(m.memberId),
-                m.memberName.as(m.memberName),
-                m.instrumental.as(m.instrumental),
-            GroupBy.set(artistBean).as("artist")
-        );
 
         // 色々やってみたが、QueryDSL でのマッピングは最上位のクラスにのみ行うらしい。
         // ネストしているListにはマッピングしてくれる気配がない。
         // そのため、ドメインモデルを構築するためのDTO的なクラスが必要になる。
-        return sqlQueryFactory.from(musicFestival)
+        // Projections.bean は setter を使うが、Projections.constructor はコンストラクタを使うので、
+        // コンストラクタから構築する。
+        //  3.2.2. Bean population 3.2.3. Constructor usage
+        // http://www.querydsl.com/static/querydsl/latest/reference/html/ch03s02.html
+        return sqlQueryFactory.selectDistinct(
+                Projections.constructor(MusicFestival.class,
+                        mf.festivalId,
+                        mf.festivalName,
+                        mf.place,
+                        mf.eventDate,
+                        Projections.constructor(Artist.class,
+                                a.festivalId.as(a.festivalId),
+                                a.artistId,
+                                a.artistName,
+                                Projections.constructor(MemberInformation.class,
+                                        m.artistId.as(m.artistId),
+                                        m.memberId,
+                                        m.memberName,
+                                        m.instrumental)
+                        )
+                )
+        )
                 .from(musicFestival.as(mf))
                 .leftJoin(artist, a)
                 .on(mf.festivalId.eq(a.festivalId))
                 .leftJoin(member, m)
                 .on(a.artistId.eq(m.artistId))
-                .transform(GroupBy.groupBy(artistBean).list(bean))
-                .stream().distinct().collect(Collectors.toList());
-//        return sqlQueryFactory
-//                .selectDistinct(
-//                        Projections.bean(musicFestival,
-//                        mf.festivalId,
-//                        mf.festivalName,
-//                        mf.eventDate,
-//                        mf.place,
-//                        a.artistId,
-//                        a.artistName
-//                        m.memberId.as(m.memberId),
-//                        m.memberName.as(m.memberName),
-//                        m.instrumental.as(m.instrumental)
-//                        ))
-//                .from(musicFestival.as(mf))
-//                .leftJoin(artist, a)
-//                .on(mf.festivalId.eq(a.festivalId))
-//                .leftJoin(member, m)
-//                .on(a.artistId.eq(m.artistId))
-//                .fetch().stream().distinct().collect(Collectors.toList());
+                .fetch()
+                ;
     }
 
     public <T extends Serializable> List<MusicFestival> findMusicFestivalWhereJoin() {
         log.info("where join");
         QueryResults<MusicFestival> results = sqlQueryFactory
                 .selectDistinct(
-                       Projections.bean(MusicFestival.class,
-                               mf.festivalId,
-                               mf.festivalName,
-                               mf.eventDate,
-                               mf.place,
-                               a.artistId,
-                               m.memberId,
-                               m.memberName,
-                               m.instrumental
+                        Projections.bean(MusicFestival.class,
+                                mf.festivalId,
+                                mf.festivalName,
+                                mf.eventDate,
+                                mf.place,
+                                a.artistId,
+                                m.memberId,
+                                m.memberName,
+                                m.instrumental
                         ))
                 .from(musicFestival.as(mf), artist.as(a), member.as(m))
                 .where(mf.festivalId.eq(a.festivalId))
@@ -128,6 +98,79 @@ public class MusicFestivalRepository {
         return results.getResults();
     }
 
+    public List<MusicFestival> findMusicFestivalByTransform() {
+
+        ConstructorExpression<MemberInformation> memberInformationConstructorExpression = Projections.constructor(MemberInformation.class,
+                m.artistId.as(m.artistId),
+                m.memberId,
+                m.memberName,
+                m.instrumental
+        );
+
+        ConstructorExpression<Artist> artistConstructor = Projections.constructor(Artist.class,
+                a.festivalId.as(a.festivalId),
+                a.artistId,
+                a.artistName,
+                memberInformationConstructorExpression
+        );
+
+        ConstructorExpression<MusicFestival> musicFestivalConstructorExpression = Projections.constructor(MusicFestival.class,
+                mf.festivalId,
+                mf.festivalName,
+                mf.place,
+                mf.eventDate,
+                artistConstructor
+        );
+
+        return sqlQueryFactory.selectDistinct(musicFestivalConstructorExpression)
+                .from(musicFestival.as(mf))
+                .leftJoin(artist, a)
+                .on(mf.festivalId.eq(a.festivalId))
+                .leftJoin(member, m)
+                .on(a.artistId.eq(m.artistId))
+        // Projections.bean は setter で値を設定するので、ルートのエンティティにネストしたクラスのメンバーを定義する必要があるので、DTO を作る必要がある。
+        // Projections.constructor では、DTO は作る必要はないように思うが、取得結果を基に、ドメインモデルは自力で構築する必要があるようだ。。。
+                .transform(GroupBy.groupBy(musicFestivalConstructorExpression)
+                        .list(musicFestivalConstructorExpression))
+                ;
+
+    }
+    public List<MusicFestival> findMusicFestivalByList() {
+        QList memberList = Projections.list(
+                m.artistId.as(m.artistId),
+                m.memberId,
+                m.memberName,
+                m.instrumental
+        );
+        QList artistList = Projections.list(
+                a.festivalId.as(a.festivalId),
+                a.artistId,
+                a.artistName,
+                memberList
+        );
+
+        ConstructorExpression<MusicFestival> musicFestivalConstructorExpression = Projections.constructor(MusicFestival.class,
+                mf.festivalId,
+                mf.festivalName,
+                mf.place,
+                mf.eventDate,
+                artistList
+        );
+
+        return sqlQueryFactory.selectDistinct(musicFestivalConstructorExpression)
+                .from(musicFestival.as(mf))
+                .leftJoin(artist, a)
+                .on(mf.festivalId.eq(a.festivalId))
+                .leftJoin(member, m)
+                .on(a.artistId.eq(m.artistId))
+                // Projections.list にて射影をした場合、transform にてネストしたリストにnullの値を設定されないようにする。
+                // なお、Projections.list を指定した場合においても、List<Artist> のコンストラクタは動作するが、List<Artist> 、
+                // の各業に都合よく Set<Members> が設定されているようなことはない。
+                .transform(GroupBy.groupBy(musicFestivalConstructorExpression)
+                        .list(musicFestivalConstructorExpression))
+                ;
+
+    }
     public List<MusicFestival> findMusicFestivalByJPAQuery() {
         log.info("jpa query");
         JPAQueryFactory qFactory = new JPAQueryFactory(em);

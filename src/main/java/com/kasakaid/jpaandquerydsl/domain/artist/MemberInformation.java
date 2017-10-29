@@ -1,13 +1,17 @@
 package com.kasakaid.jpaandquerydsl.domain.artist;
 
-import lombok.*;
-import javax.persistence.*;
+import com.querydsl.core.annotations.QueryProjection;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import java.io.Serializable;
 
 @Entity
 @Getter
-@Setter
-@Data
 @NoArgsConstructor
 public class MemberInformation implements Serializable {
     @Id
@@ -23,7 +27,8 @@ public class MemberInformation implements Serializable {
     @JoinColumn(name = "artistId", insertable = false, updatable = false)
     private Artist artist;
 
-    public MemberInformation(int memberId, int artistId, String memberName, String instrumental) {
+    @QueryProjection
+    public MemberInformation(int artistId, int memberId,  String memberName, String instrumental) {
         this.artistId = artistId;
         this.memberId = memberId;
         this.memberName = memberName;

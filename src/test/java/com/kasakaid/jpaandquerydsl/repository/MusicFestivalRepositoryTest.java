@@ -66,4 +66,18 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
         assertThat(list1.size(), is(1));
         assertThat(list1.get(0).getArtists().size(), greaterThan(0));
     }
+    @Test
+    public void findByTransFormTest() {
+        List<MusicFestival> list1 = repository.findMusicFestivalByTransform();
+        assertThat(list1.get(0).getArtists(), notNullValue());
+        assertThat(list1.size(), is(1));
+        assertThat(list1.get(0).getArtists().size(), greaterThan(0));
+    }
+    @Test
+    public void findByListTest() {
+        List<MusicFestival> list1 = repository.findMusicFestivalByList();
+        assertThat(list1.get(0).getArtists(), notNullValue());
+        assertThat(list1.size(), is(1));
+        assertThat(list1.get(0).getArtists().size(), greaterThan(0));
+    }
 }
