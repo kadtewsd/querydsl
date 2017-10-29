@@ -1,24 +1,17 @@
 package com.kasakaid.jpaandquerydsl.domain.artist;
 
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import com.querydsl.core.annotations.QueryProjection;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Set;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Getter
+@NoArgsConstructor
+@Data
 public class Artist implements Serializable {
-
-    Artist(int artistId, String name) {
-        this.artistId = artistId;
-        this.artistName = name;
-    }
 
     // SqlQueryFactory では列名がかぶると SQL の重複エラーになる
     @Id
@@ -27,6 +20,20 @@ public class Artist implements Serializable {
     private int festivalId;
 
     private String artistName;
+
+    @QueryProjection
+    public Artist(int artistId, int festivalId, String artistName) {
+        this.artistId = artistId;
+        this.festivalId = festivalId;
+        this.artistName = artistName;
+    }
+    public Artist(int artistId, int festivalId, String artistName, MusicFestival musicFestival, Set<MemberInformation> memberInformation) {
+        this.artistId = artistId;
+        this.festivalId = festivalId;
+        this.artistName = artistName;
+        this.musicFestival = musicFestival;
+        this.members = memberInformation;
+    }
 
 //    @Enumerated(EnumType.STRING)
 //    private Genre genre;

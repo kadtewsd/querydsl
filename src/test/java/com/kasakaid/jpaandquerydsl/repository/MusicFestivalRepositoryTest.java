@@ -5,6 +5,7 @@ import com.kasakaid.jpaandquerydsl.Application;
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
 import com.kasakaid.jpaandquerydsl.spring.TestConfig;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,12 +16,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
-import static org.hamcrest.core.IsNot.not;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.MatcherAssert.*;
 
 @SpringBootTest(classes = {Application.class, TestConfig.class})
 @RunWith(SpringRunner.class)
 @ActiveProfiles("test")
+@Slf4j
 public class MusicFestivalRepositoryTest extends AbstractBaseTest {
 
     @SneakyThrows
@@ -37,23 +40,30 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
 
     @Test
     public void selectJPAQueryFactory() {
+        List<MusicFestival> list = normalJpaRepository.findAll();
+        assertThat(list.size(), is(3));
         List<MusicFestival> list0 = repository.findMusicFestivalByJPAQuery();
-        assertThat(list0.size(), not(0));
-        List<MusicFestival> list = normalJpaRepository.findAll();
-        assertThat(list.size(), not(0));
+        assertThat(list0.get(0).getArtists(), notNullValue());
+        assertThat(list0.get(0).getArtists().size(), greaterThan(0));
+        assertThat(list0.size(), is(1));
     }
 
     @Test
-    public void selectSqlQueryFactory() {
+    public void leftJoinTableTest() {
         List<MusicFestival> list = normalJpaRepository.findAll();
-        assertThat(list.size(), not(0));
+        assertThat(list.size(), is(3));
         List<MusicFestival> list0 = repository.findMusicFestival();
-        assertThat(list0.size(), not(0));
+        assertThat(list0.get(0).getArtists(), notNullValue());
+        assertThat(list0.get(0).getArtists().size(), greaterThan(0));
+        assertThat(list0.size(), is(3));
+        list.forEach(x -> log.info(x.getFestivalName()));
     }
 
     @Test
-    public void JoinTableTest() {
+    public void whereJoinTableTest() {
         List<MusicFestival> list1 = repository.findMusicFestivalWhereJoin();
-        assertThat(list1.size(), not(0));
+        assertThat(list1.get(0).getArtists(), notNullValue());
+        assertThat(list1.size(), is(1));
+        assertThat(list1.get(0).getArtists().size(), greaterThan(0));
     }
 }

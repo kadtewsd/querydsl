@@ -2,9 +2,14 @@ package com.kasakaid.jpaandquerydsl.repository;
 
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
 import com.kasakaid.jpaandquerydsl.domain.QMusicFestival;
+import com.kasakaid.jpaandquerydsl.domain.artist.Artist;
+import com.kasakaid.jpaandquerydsl.domain.artist.MemberInformation;
 import com.kasakaid.jpaandquerydsl.domain.artist.QArtist;
 import com.kasakaid.jpaandquerydsl.domain.artist.QMemberInformation;
+import com.querydsl.core.QueryResults;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.QBean;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.sql.SQLQueryFactory;
@@ -14,7 +19,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,38 +35,79 @@ public class MusicFestivalRepository {
     private QMusicFestival musicFestival = QMusicFestival.musicFestival;
     private QMusicFestival mf = new QMusicFestival("mf");
     private QArtist artist = QArtist.artist;
-    private QArtist a = new QArtist("a");
+    private QArtist a = new QArtist("artists");
     // 名前がかぶる場合、テーブル名はmember1 とかいう感じで解釈される。
     private QMemberInformation member = QMemberInformation.memberInformation;
     private QMemberInformation m = new QMemberInformation("m");
 
     public List<MusicFestival> findMusicFestival() {
-        log.info("inner join");
+        log.info("left join");
         // SQLQueryFactory だと列名を指定する必要がある。
-        return sqlQueryFactory
-                .selectDistinct(
-                        Projections.bean(MusicFestival.class,
-                        mf.festivalId,
-                        mf.festivalName,
-                        mf.eventDate,
-                        mf.place,
+
+        QBean<MemberInformation> memberInformationBean = Projections.bean(MemberInformation.class,
+                m.memberId,
+                m.artistId,
+                m.memberName,
+                m.instrumental
+        );
+
+        QBean<Artist> artistBean = Projections.bean(Artist.class,
                         a.artistId,
+                        a.festivalId,
                         a.artistName,
-                        m.memberId,
-                        m.memberName,
-                        m.instrumental
-                        ))
+                GroupBy.set(memberInformationBean).as("member")
+        );
+        QBean<MusicFestival> bean = Projections.bean(MusicFestival.class,
+                mf.festivalId,
+                mf.festivalName,
+                mf.eventDate,
+                mf.place,
+                Projections.bean(Artist.class,
+                        a.artistId.as("artists.artistId"),
+                        a.festivalId,
+                        a.artistName
+                ).as("artistsR"),
+                m.memberId.as(m.memberId),
+                m.memberName.as(m.memberName),
+                m.instrumental.as(m.instrumental),
+            GroupBy.set(artistBean).as("artist")
+        );
+
+        // 色々やってみたが、QueryDSL でのマッピングは最上位のクラスにのみ行うらしい。
+        // ネストしているListにはマッピングしてくれる気配がない。
+        // そのため、ドメインモデルを構築するためのDTO的なクラスが必要になる。
+        return sqlQueryFactory.from(musicFestival)
                 .from(musicFestival.as(mf))
                 .leftJoin(artist, a)
                 .on(mf.festivalId.eq(a.festivalId))
                 .leftJoin(member, m)
                 .on(a.artistId.eq(m.artistId))
-                .fetch();
+                .transform(GroupBy.groupBy(artistBean).list(bean))
+                .stream().distinct().collect(Collectors.toList());
+//        return sqlQueryFactory
+//                .selectDistinct(
+//                        Projections.bean(musicFestival,
+//                        mf.festivalId,
+//                        mf.festivalName,
+//                        mf.eventDate,
+//                        mf.place,
+//                        a.artistId,
+//                        a.artistName
+//                        m.memberId.as(m.memberId),
+//                        m.memberName.as(m.memberName),
+//                        m.instrumental.as(m.instrumental)
+//                        ))
+//                .from(musicFestival.as(mf))
+//                .leftJoin(artist, a)
+//                .on(mf.festivalId.eq(a.festivalId))
+//                .leftJoin(member, m)
+//                .on(a.artistId.eq(m.artistId))
+//                .fetch().stream().distinct().collect(Collectors.toList());
     }
 
-    public List<MusicFestival> findMusicFestivalWhereJoin() {
+    public <T extends Serializable> List<MusicFestival> findMusicFestivalWhereJoin() {
         log.info("where join");
-        return sqlQueryFactory
+        QueryResults<MusicFestival> results = sqlQueryFactory
                 .selectDistinct(
                        Projections.bean(MusicFestival.class,
                                mf.festivalId,
@@ -67,7 +115,6 @@ public class MusicFestivalRepository {
                                mf.eventDate,
                                mf.place,
                                a.artistId,
-                               a.artistName,
                                m.memberId,
                                m.memberName,
                                m.instrumental
@@ -75,9 +122,10 @@ public class MusicFestivalRepository {
                 .from(musicFestival.as(mf), artist.as(a), member.as(m))
                 .where(mf.festivalId.eq(a.festivalId))
                 .where(a.artistId.eq(m.artistId))
-                .fetchResults()
-                .getResults();
-//                .fetch(); // fetch で実行すると musicFestival という列を探しに行こうとする。
+//                .fetch();
+                .fetchResults();
+//                .getResults().stream().distinct().collect(Collectors.toList());
+        return results.getResults();
     }
 
     public List<MusicFestival> findMusicFestivalByJPAQuery() {
