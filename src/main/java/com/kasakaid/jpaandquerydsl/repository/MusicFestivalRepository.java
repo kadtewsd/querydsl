@@ -15,15 +15,15 @@ import com.querydsl.sql.SQLQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.util.List;
 
+@Transactional
 @Repository
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class MusicFestivalRepository {
     private final SQLQueryFactory sqlQueryFactory;

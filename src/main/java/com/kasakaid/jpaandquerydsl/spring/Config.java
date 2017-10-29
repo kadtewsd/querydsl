@@ -17,10 +17,12 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.inject.Provider;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.sql.Connection;
 
@@ -56,6 +58,11 @@ public class Config {
         return template;
     }
 
+//    @Bean
+//    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory){
+//        JpaTransactionManager jpaTransactionManager = new JpaTransactionManager(entityManagerFactory);
+//        return jpaTransactionManager;
+//    }
     @Bean
     public com.querydsl.sql.Configuration querydslConfiguration() {
         SQLTemplates templates = MySQLTemplates.builder().build(); //change to your Templates
