@@ -40,5 +40,7 @@ public class MemberInformation implements Serializable {
         this.memberName = memberName;
         this.instrumental = instrumental;
         this.artist = artist;
+        this.artist.generateMembers();
+        this.artist.getMembers().add(this);
     }
 }

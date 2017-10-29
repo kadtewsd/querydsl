@@ -128,13 +128,13 @@ public class MusicFestivalRepository {
                 .on(mf.festivalId.eq(a.festivalId))
                 .leftJoin(member, m)
                 .on(a.artistId.eq(m.artistId))
-        // Projections.bean は setter で値を設定するので、ルートのエンティティにネストしたクラスのメンバーを定義する必要があるので、DTO を作る必要がある。
-        // Projections.constructor では、DTO は作る必要はないように思うが、取得結果を基に、ドメインモデルは自力で構築する必要があるようだ。。。
+                // Projections.bean は setter で値を設定するので、ルートのエンティティにネストしたクラスのメンバーを定義する必要があるので、DTO を作る必要がある。
+                // Projections.constructor では、DTO は作る必要はないように思うが、取得結果を基に、ドメインモデルは自力で構築する必要があるようだ。。。
                 .transform(GroupBy.groupBy(musicFestivalConstructorExpression)
                         .list(musicFestivalConstructorExpression))
                 ;
-
     }
+
     public List<MusicFestival> findMusicFestivalByList() {
         QList memberList = Projections.list(
                 m.artistId.as(m.artistId),
@@ -157,7 +157,7 @@ public class MusicFestivalRepository {
                 artistList
         );
 
-        return sqlQueryFactory.selectDistinct(musicFestivalConstructorExpression)
+        return sqlQueryFactory
                 .from(musicFestival.as(mf))
                 .leftJoin(artist, a)
                 .on(mf.festivalId.eq(a.festivalId))
@@ -171,6 +171,165 @@ public class MusicFestivalRepository {
                 ;
 
     }
+
+    public List<MusicFestival> findMusicFestivalByReverse() {
+
+        ConstructorExpression<MusicFestival> musicFestivalConstructorExpression = Projections.constructor(MusicFestival.class,
+                mf.festivalId,
+                mf.festivalName,
+                mf.place,
+                mf.eventDate
+        );
+
+        ConstructorExpression<Artist> artistConstructor = Projections.constructor(Artist.class,
+                a.festivalId.as(a.festivalId),
+                a.artistId,
+                a.artistName,
+                musicFestivalConstructorExpression
+        );
+
+        ConstructorExpression<MemberInformation> memberInformationConstructorExpression = Projections.constructor(MemberInformation.class,
+                m.artistId.as(m.artistId),
+                m.memberId,
+                m.memberName,
+                m.instrumental,
+                artistConstructor
+        );
+
+        QBean<MusicFestival> projection = Projections.bean(MusicFestival.class,
+                mf.festivalId.as(mf.festivalId),
+                mf.festivalName,
+                mf.place,
+                mf.eventDate,
+                a.festivalId.as("a.festivalId"), // 重複する列は別途エイリアスをつける
+                a.artistId,
+                a.artistName,
+                m.artistId.as("m.artistId"),
+                m.memberId,
+                m.memberName,
+                m.instrumental);
+
+        return sqlQueryFactory
+                .from(musicFestival.as(mf))
+                .leftJoin(artist, a)
+                .on(mf.festivalId.eq(a.festivalId))
+                .leftJoin(member, m)
+                .on(a.artistId.eq(m.artistId))
+                // Projections.bean は setter で値を設定するので、ルートのエンティティにネストしたクラスのメンバーを定義する必要があるので、DTO を作る必要がある。
+                // Projections.constructor では、DTO は作る必要はないように思うが、取得結果を基に、ドメインモデルは自力で構築する必要があるようだ。。。
+                .transform(GroupBy.groupBy(memberInformationConstructorExpression)
+                        .list(musicFestivalConstructorExpression))
+                ;
+    }
+
+    public List<MusicFestival> findMusicFestivalByNestedList() {
+        // list で射影すると unmodifiableList というよくわからない型で返ってくる。
+        ConstructorExpression<MusicFestival> projection = Projections.constructor(MusicFestival.class,
+                mf.festivalId,
+                mf.festivalName,
+                mf.place,
+                mf.eventDate,
+                Projections.list(
+                        a.festivalId.as(a.festivalId),
+                        a.artistId,
+                        a.artistName,
+                        Projections.list(
+                                m.artistId.as(m.artistId),
+                                m.memberId,
+                                m.memberName,
+                                m.instrumental
+                        )
+                )
+        );
+
+        ConstructorExpression<MusicFestival> musicFestivalConstructorExpression = Projections.constructor(MusicFestival.class,
+                mf.festivalId,
+                mf.festivalName,
+                mf.place,
+                mf.eventDate
+        );
+
+        ConstructorExpression<Artist> artistConstructor = Projections.constructor(Artist.class,
+                a.festivalId.as(a.festivalId),
+                a.artistId,
+                a.artistName,
+                musicFestivalConstructorExpression
+        );
+
+        ConstructorExpression<MemberInformation> memberInformationConstructorExpression = Projections.constructor(MemberInformation.class,
+                m.artistId.as(m.artistId),
+                m.memberId,
+                m.memberName,
+                m.instrumental,
+                artistConstructor
+        );
+        ConstructorExpression<MusicFestival> groupBy = Projections.constructor(MusicFestival.class,
+                mf.festivalId,
+                a.artistId
+        );
+        return sqlQueryFactory
+                .from(musicFestival.as(mf))
+                .leftJoin(artist, a)
+                .on(mf.festivalId.eq(a.festivalId))
+                .leftJoin(member, m)
+                .on(a.artistId.eq(m.artistId))
+                // Projections.bean は setter で値を設定するので、ルートのエンティティにネストしたクラスのメンバーを定義する必要があるので、DTO を作る必要がある。
+                // Projections.constructor では、DTO は作る必要はないように思うが、取得結果を基に、ドメインモデルは自力で構築する必要があるようだ。。。
+                .transform(GroupBy.groupBy(mf.festivalId, a.artistId)
+                        .list(projection))
+                ;
+    }
+
+    public List<MemberInformation> findMusicFestivalByBottom() {
+
+        ConstructorExpression<MusicFestival> musicFestivalConstructorExpression = Projections.constructor(MusicFestival.class,
+                mf.festivalId,
+                mf.festivalName,
+                mf.place,
+                mf.eventDate
+        );
+
+        ConstructorExpression<Artist> artistConstructor = Projections.constructor(Artist.class,
+                a.festivalId.as(a.festivalId),
+                a.artistId,
+                a.artistName,
+                musicFestivalConstructorExpression
+        );
+
+        ConstructorExpression<MemberInformation> memberInformationConstructorExpression = Projections.constructor(MemberInformation.class,
+                m.artistId.as(m.artistId),
+                m.memberId,
+                m.memberName,
+                m.instrumental,
+                artistConstructor
+        );
+
+        QBean<MemberInformation> projection = Projections.bean(MemberInformation.class,
+                mf.festivalId.as(mf.festivalId),
+                mf.festivalName,
+                mf.place,
+                mf.eventDate,
+                a.festivalId.as("a.festivalId"), // 重複する列は別途エイリアスをつける
+                a.artistId,
+                a.artistName,
+                m.artistId.as("m.artistId"),
+                m.memberId,
+                m.memberName,
+                m.instrumental);
+
+        return sqlQueryFactory
+                .from(musicFestival.as(mf))
+                .leftJoin(artist, a)
+                .on(mf.festivalId.eq(a.festivalId))
+                .leftJoin(member, m)
+                .on(a.artistId.eq(m.artistId))
+                // Projections.bean は setter で値を設定するので、ルートのエンティティにネストしたクラスのメンバーを定義する必要があるので、DTO を作る必要がある。
+                // Projections.constructor では、DTO は作る必要はないように思うが、取得結果を基に、ドメインモデルは自力で構築する必要があるようだ。。。
+                .transform(GroupBy.groupBy(memberInformationConstructorExpression)
+                        .list(memberInformationConstructorExpression))
+                ;
+    }
+
     public List<MusicFestival> findMusicFestivalByJPAQuery() {
         log.info("jpa query");
         JPAQueryFactory qFactory = new JPAQueryFactory(em);

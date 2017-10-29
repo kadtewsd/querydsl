@@ -2,13 +2,11 @@ package com.kasakaid.jpaandquerydsl.domain.artist;
 
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @NoArgsConstructor
@@ -22,6 +20,14 @@ public class Artist implements Serializable {
     private int festivalId;
 
     private String artistName;
+
+    @QueryProjection
+    public Artist(int festivalId, int artistId, String artistName, Set<MemberInformation> members) {
+        this.artistId = artistId;
+        this.festivalId = festivalId;
+        this.artistName = artistName;
+        this.members = members;
+    }
 
     @QueryProjection
     public Artist(int festivalId, int artistId, String artistName) {
@@ -38,15 +44,20 @@ public class Artist implements Serializable {
         this.members.add(memberInformation);
     }
 
+    @QueryProjection
+    public Artist(int festivalId, int artistId, String artistName, MusicFestival musicFestival) {
+        this.artistId = artistId;
+        this.festivalId = festivalId;
+        this.artistName = artistName;
+        this.musicFestival = musicFestival;
+        musicFestival.generateArtists();
+        this.musicFestival.getArtists().add(this);
+    }
+
     public Artist(MemberInformation memberInformation) {
         this.members = new LinkedHashSet<>();
         members.add(memberInformation);
     }
-
-//    @Enumerated(EnumType.STRING)
-//    private Genre genre;
-
-//    private String artistType;
 
     @ManyToOne
     @JoinColumn(name = "festivalId", insertable = false, updatable = false)
@@ -55,4 +66,9 @@ public class Artist implements Serializable {
     @OneToMany(mappedBy = "artist",fetch = FetchType.EAGER)
     private Set<MemberInformation> members;
 
+    void generateMembers() {
+        if (this.members == null) {
+            members = new HashSet<>();
+        }
+    }
 }

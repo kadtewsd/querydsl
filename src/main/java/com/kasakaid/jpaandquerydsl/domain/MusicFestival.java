@@ -3,8 +3,7 @@ package com.kasakaid.jpaandquerydsl.domain;
 import com.kasakaid.jpaandquerydsl.domain.artist.Artist;
 import com.kasakaid.jpaandquerydsl.domain.artist.MemberInformation;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -38,7 +37,7 @@ public class MusicFestival implements Serializable {
         this.festivalName = festivalName;
         this.place = place;
         this.eventDate = eventDate;
-        this.artists = new LinkedList<>();
+        this.generateArtists();
         artists.add(artist);
     }
 
@@ -63,15 +62,26 @@ public class MusicFestival implements Serializable {
         this.festivalName = festivalName;
         this.place = place;
         this.eventDate = eventDate;
-        this.artists =  new LinkedList<>();
+        this.generateArtists();
         this.artists.add(artist);
     }
 
     public MusicFestival(Artist artist) {
         artists.add(artist);
     }
+
+    public MusicFestival(int festivalId, int artistId) {
+        this.festivalId = festivalId;
+        this.generateArtists();
+    }
     //SqlQueryFactory においても、fetch 属性は影響がある。デフォルトは Lazy になる。
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "musicFestival")
     @OrderBy("festivalId ASC")
-    private List<Artist> artists = new LinkedList<>();
+    private List<Artist> artists;
+
+    public void generateArtists() {
+        if (this.artists == null) {
+            this.artists = new LinkedList<>();
+        }
+    }
 }
