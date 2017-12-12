@@ -355,7 +355,8 @@ public class MusicFestivalRepository {
                 .from(musicFestival)
                 .where(
                         SQLExpressions.select(Expressions.asNumber(1))
-                                .from(musicFestival, mf)
+//                                .from(musicFestival, mf)
+                                .from(mf)
                                 .where(musicFestival.festivalId.eq(mf.festivalId))
                                 .exists()
                 )
