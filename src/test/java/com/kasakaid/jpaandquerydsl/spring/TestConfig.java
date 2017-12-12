@@ -28,17 +28,21 @@ public class TestConfig {
     @Bean
     public TransactionAwareDataSourceProxy dataSource() {
         net.sf.log4jdbc.sql.jdbcapi.DataSourceSpy proxyDs = null;
-        if ("jdbc:log4jdbc:h2:mem:test;MODE=MySQL;DB_CLOSE_ON_EXIT=FALSE".equals(environment.getProperty("spring.datasource.url"))) {
+        if ("jdbc:log4jdbc:h2:mem:testDB;MODE=MySQL;DB_CLOSE_ON_EXIT=FALSE".equals(environment.getProperty("spring.datasource.url"))) {
             EmbeddedDatabase ds = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
             proxyDs = new net.sf.log4jdbc.sql.jdbcapi.DataSourceSpy(ds);
             return new TransactionAwareDataSourceProxy(proxyDs);
         }
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         proxyDs = new net.sf.log4jdbc.sql.jdbcapi.DataSourceSpy(dataSource);
-        dataSource.setDriverClassName("net.sf.log4jdbc.DriverSpy");
-        dataSource.setUrl("jdbc:log4jdbc:mysql://localhost:3306/testdb");
-        dataSource.setUsername("root");
-        dataSource.setPassword("mysql");
+//        dataSource.setDriverClassName("net.sf.log4jdbc.DriverSpy");
+//        dataSource.setUrl("jdbc:log4jdbc:mysql://localhost:3306/kasakaid");
+//        dataSource.setUsername("root");
+//        dataSource.setPassword("mysql");
+        dataSource.setDriverClassName(environment.getProperty("spring.datasource.driver-class-name"));
+        dataSource.setUrl(environment.getProperty("spring.datasource.url"));
+        dataSource.setUsername(environment.getProperty("spring.datasource.username"));
+        dataSource.setPassword(environment.getProperty("spring.datasource.password"));
         return new TransactionAwareDataSourceProxy(proxyDs);
     }
 
