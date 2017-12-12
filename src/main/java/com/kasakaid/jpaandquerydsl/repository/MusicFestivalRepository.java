@@ -371,7 +371,8 @@ public class MusicFestivalRepository {
                 .from(musicFestival)
                 .where(
                         SQLExpressions.select(Expressions.asNumber(1))
-                                .from(musicFestival, mf)
+                                .from(mf)
+//                                .from(musicFestival, mf) // これだと、cross join する。
                                 .where(musicFestival.festivalId.eq(mf.festivalId))
                                 .notExists()
                 )

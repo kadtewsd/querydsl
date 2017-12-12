@@ -115,8 +115,7 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
 
     @Test
     public void findByNotExists() {
-        // 自分に not exists するとなんと cross join!
-        List<MusicFestival> list1 = repository.findMusicFestivalByExists();
+        List<MusicFestival> list1 = repository.findMusicFestivalByNotExists();
         assertThat(list1.size(), is(0));
     }
 }
