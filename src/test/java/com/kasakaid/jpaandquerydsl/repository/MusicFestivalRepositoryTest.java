@@ -105,4 +105,18 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
         assertThat(list1.size(), is(3));
     }
 
+    @Test
+    public void findByExists() {
+        List<MusicFestival> list1 = repository.findMusicFestivalByExists();
+        assertThat(list1.get(0).getArtists(), notNullValue());
+        assertThat(list1.get(0).getArtists().size(), greaterThan(0));
+        assertThat(list1.size(), is(3));
+    }
+
+    @Test
+    public void findByNotExists() {
+        // 自分に not exists するとなんと cross join!
+        List<MusicFestival> list1 = repository.findMusicFestivalByExists();
+        assertThat(list1.size(), is(0));
+    }
 }
