@@ -38,12 +38,16 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
     private MusicFestivalRepository repository;
     @Autowired
     private NormalJpaRepository normalJpaRepository;
+    @Autowired
+    private JpaMusicFestivalRepository jpaMusicFestivalRepository;
+    @Autowired
+    private MusicFestivalDMLRepository dmlRepository;
 
     @Test
     public void selectJPAQueryFactory() {
         List<MusicFestival> list = normalJpaRepository.findAll();
         assertThat(list.size(), is(3));
-        List<MusicFestival> list0 = repository.findMusicFestivalByJPAQuery();
+        List<MusicFestival> list0 = jpaMusicFestivalRepository.findMusicFestivalByJPAQuery();
         assertThat(list0.get(0).getArtists(), notNullValue());
         assertThat(list0.get(0).getArtists().size(), greaterThan(0));
         assertThat(list0.size(), is(1));
@@ -107,7 +111,7 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
 
     @Test
     public void findByExists() {
-        List<MusicFestival> list1 = repository.findMusicFestivalByExists();
+        List<MusicFestival> list1 = jpaMusicFestivalRepository.findMusicFestivalByExists();
         assertThat(list1.get(0).getArtists(), notNullValue());
         assertThat(list1.get(0).getArtists().size(), greaterThan(0));
         assertThat(list1.size(), is(3));
@@ -115,7 +119,17 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
 
     @Test
     public void findByNotExists() {
-        List<MusicFestival> list1 = repository.findMusicFestivalByNotExists();
+        List<MusicFestival> list1 = jpaMusicFestivalRepository.findMusicFestivalByNotExists();
         assertThat(list1.size(), is(0));
+    }
+
+    @Test
+    public void testUpdate() {
+        assertThat(dmlRepository.updateFestival(), is(2L));
+    }
+
+    @Test
+    public void testUpdateIndividually() {
+        assertThat(dmlRepository.updateFestivalIndividually(), is(2L));
     }
 }

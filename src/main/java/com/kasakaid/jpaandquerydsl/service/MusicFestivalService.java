@@ -2,13 +2,13 @@ package com.kasakaid.jpaandquerydsl.service;
 
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
 import com.kasakaid.jpaandquerydsl.domain.artist.MemberInformation;
+import com.kasakaid.jpaandquerydsl.repository.JpaMusicFestivalRepository;
 import com.kasakaid.jpaandquerydsl.repository.MusicFestivalRepository;
 import com.kasakaid.jpaandquerydsl.repository.NormalJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.io.Serializable;
 import java.util.List;
 
@@ -20,7 +20,7 @@ public class MusicFestivalService {
 
     private final MusicFestivalRepository musicFestivalRepository;
     private final NormalJpaRepository normalJpaRepository;
-    private final EntityManager entityManager;
+    private final JpaMusicFestivalRepository jpaMusicFestivalRepository;
     public List<MusicFestival> findMusicFestival() {
         return musicFestivalRepository.findMusicFestival();
     }
@@ -48,7 +48,7 @@ public class MusicFestivalService {
         return musicFestivalRepository.findMusicFestivalByBottom();
     }
     public List<MusicFestival> findMusicFestivalByJPAQuery() {
-        return musicFestivalRepository.findMusicFestivalByJPAQuery();
+        return jpaMusicFestivalRepository.findMusicFestivalByJPAQuery();
     }
     public List<MusicFestival> findAll() {
         return normalJpaRepository.findAll();
