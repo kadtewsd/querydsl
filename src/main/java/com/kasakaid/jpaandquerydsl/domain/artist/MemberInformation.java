@@ -15,9 +15,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class MemberInformation implements Serializable {
     @Id
-    private int memberId;
+    private Integer memberId;
 
-    private int artistId;
+    private Integer artistId;
 
     private String memberName;
 
@@ -28,7 +28,7 @@ public class MemberInformation implements Serializable {
     private Artist artist;
 
     @QueryProjection
-    public MemberInformation(int artistId, int memberId,  String memberName, String instrumental) {
+    public MemberInformation(Integer artistId, Integer memberId,  String memberName, String instrumental) {
         this.artistId = artistId;
         this.memberId = memberId;
         this.memberName = memberName;

@@ -24,10 +24,23 @@ class EntityAdapter {
         );
     }
 
+    /**
+     * left join で null になりうる項目を QueryDSL の row.get で取得後にいきなりインスタンスのコンストラクタに渡すと、
+     * intelliJ の警告通り、NullPointerException が発生します。
+     * なぜかというと、Artist エンティティのコンストラクタの artistId などが int というプリミティブ型で宣言されているからです。
+     * ラッパークラスの値が null の場合、プリミティブに値を渡すとオートボクシングの際、NullPointExeception が発生します。
+     * 本来このような事態を避けるため、エンティティの引数の型は、primitive からラッパークラスに変更すべきですが、備忘録のため、このひどい実装を残します。
+     * 一度、ラッパーの変数に格納して、Null か判断して、NullPointerException を回避する、という力技です。
+     *
+     * @param row
+     * @return
+     */
     Artist artist(Tuple row) {
+        Integer artistId = row.get(dsl.a.artistId);
+        if (artistId == null) return new Artist();
         return new Artist(
                 row.get(dsl.a.festivalId),
-                row.get(dsl.a.artistId),
+                artistId,
                 row.get(dsl.a.artistName)
         );
     }
@@ -36,7 +49,8 @@ class EntityAdapter {
         return new MemberInformation(
                 row.get(dsl.a.artistId),
                 row.get(dsl.m.memberId),
-                row.get(dsl.m.memberName), row.get(dsl.m.instrumental)
+                row.get(dsl.m.memberName),
+                row.get(dsl.m.instrumental)
         );
     }
 
@@ -46,6 +60,7 @@ class EntityAdapter {
      * 複雑なストリームになってしまいます。
      * また、別にイミュータブルにしている訳ではないのでメリットも低いです。
      * reduce をつかってやるべきなのでしょう。
+     *
      * @param row
      * @param musicFestivals
      * @return

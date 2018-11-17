@@ -52,4 +52,10 @@ public class MusicFestivalVariationsTest extends AbstractBaseTest {
         assertThat(list1.get(1).getArtists().get(0).getArtistName(), is("ゲスの極み乙女"));
         assertThat(list1.get(1).getArtists().get(0).getMembers().size(), is(3));
     }
+
+    @Test
+    public void subQueryWithMax() {
+        List<MusicFestival> musicFestivals = mfVariation.subQueryWithMax();
+        assertThat(musicFestivals.size(), is(3));
+    }
 }
