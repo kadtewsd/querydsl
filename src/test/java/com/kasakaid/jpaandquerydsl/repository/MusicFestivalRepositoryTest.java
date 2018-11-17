@@ -53,9 +53,8 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
         List<MusicFestival> list = normalJpaRepository.findAll();
         assertThat(list.size(), is(3));
         List<MusicFestival> list0 = jpaMusicFestivalRepository.findMusicFestivalByJPAQuery();
-        assertThat(list0.get(0).getArtists(), nullValue());
-        assertThat(list0.get(0).getArtists().size(), greaterThan(0));
-        assertThat(list0.size(), is(1));
+        assertThat(list0.get(0).getArtists(), notNullValue());
+        assertThat(list0.get(0).getArtists().size(), is(6));
     }
 
     @Test
@@ -65,7 +64,7 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
         List<MusicFestival> list0 = repository.findMusicFestival();
         assertThat(list0.get(0).getArtists(), notNullValue());
         assertThat(list0.get(0).getArtists().size(), greaterThan(0));
-        assertThat(list0.size(), is(3));
+        assertThat(list0.size(), is(allRecords()));
         list.forEach(x -> log.info(x.getFestivalName()));
     }
     @Test
@@ -87,23 +86,24 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
     public void findByReverseTest() {
         List<MusicFestival> list1 = repository.findMusicFestivalByReverse();
         assertThat(list1.get(0).getArtists(), notNullValue());
-        assertThat(list1.get(0).getArtists().size(), greaterThan(0));
-        assertThat(list1.size(), is(3));
+        assertThat(list1.get(0).getArtists().size(), is(0));
+        assertThat(list1.size(), is(allRecords()));
     }
     @Test
     public void findByBottomTest() {
         List<MemberInformation> list1 = repository.findMusicFestivalByBottom();
         assertThat(list1.get(0).getArtist(), notNullValue());
         assertThat(list1.get(0).getArtist().getMembers().size(), greaterThan(0));
-        assertThat(list1.size(), is(3));
+        assertThat(list1.size(), is(allRecords()));
     }
 
     @Test
     public void findByNestedListTest() {
+        // メンバー分が 1 つになる.
         List<MusicFestival> list1 = repository.findMusicFestivalByNestedList();
         assertThat(list1.get(0).getArtists(), notNullValue());
         assertThat(list1.get(0).getArtists().size(), greaterThan(0));
-        assertThat(list1.size(), is(3));
+        assertThat(list1.size(), is(allRecords() - 3));
     }
 
     @Test

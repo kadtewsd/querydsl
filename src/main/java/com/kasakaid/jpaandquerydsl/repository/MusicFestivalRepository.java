@@ -6,11 +6,9 @@ import com.kasakaid.jpaandquerydsl.domain.artist.Artist;
 import com.kasakaid.jpaandquerydsl.domain.artist.MemberInformation;
 import com.kasakaid.jpaandquerydsl.domain.artist.QArtist;
 import com.kasakaid.jpaandquerydsl.domain.artist.QMemberInformation;
-import com.querydsl.core.QueryResults;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.QBean;
 import com.querydsl.core.types.QList;
 import com.querydsl.sql.SQLQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import java.io.Serializable;
 import java.util.List;
 
 // リポジトリを直接コールすると例外が発生する。あえて、@Transactional をつける。
@@ -28,10 +24,12 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 @Slf4j
+/**
+ * このクラスの実装だと最も細かい粒度のエンティティの数だけレコードが生成される。
+ * CQRS でリードモデルを作るときは問題ないが、エンティティを作ろうとすると非常に問題がある実装
+ */
 public class MusicFestivalRepository {
     private final SQLQueryFactory sqlQueryFactory;
-
-    private final EntityManager em;
 
     private QMusicFestival musicFestival = QMusicFestival.musicFestival;
     private QMusicFestival mf = new QMusicFestival("mf");
@@ -176,19 +174,6 @@ public class MusicFestivalRepository {
                 artistConstructor
         );
 
-        QBean<MusicFestival> projection = Projections.bean(MusicFestival.class,
-                mf.festivalId.as(mf.festivalId),
-                mf.festivalName,
-                mf.place,
-                mf.eventDate,
-                a.festivalId.as("a.festivalId"), // 重複する列は別途エイリアスをつける
-                a.artistId,
-                a.artistName,
-                m.artistId.as("m.artistId"),
-                m.memberId,
-                m.memberName,
-                m.instrumental);
-
         return sqlQueryFactory
                 .from(musicFestival.as(mf))
                 .leftJoin(artist, a)
@@ -236,17 +221,6 @@ public class MusicFestivalRepository {
                 musicFestivalConstructorExpression
         );
 
-        ConstructorExpression<MemberInformation> memberInformationConstructorExpression = Projections.constructor(MemberInformation.class,
-                m.artistId.as(m.artistId),
-                m.memberId,
-                m.memberName,
-                m.instrumental,
-                artistConstructor
-        );
-        ConstructorExpression<MusicFestival> groupBy = Projections.constructor(MusicFestival.class,
-                mf.festivalId,
-                a.artistId
-        );
         return sqlQueryFactory
                 .from(musicFestival.as(mf))
                 .leftJoin(artist, a)
@@ -283,19 +257,6 @@ public class MusicFestivalRepository {
                 m.instrumental,
                 artistConstructor
         );
-
-        QBean<MemberInformation> projection = Projections.bean(MemberInformation.class,
-                mf.festivalId.as(mf.festivalId),
-                mf.festivalName,
-                mf.place,
-                mf.eventDate,
-                a.festivalId.as("a.festivalId"), // 重複する列は別途エイリアスをつける
-                a.artistId,
-                a.artistName,
-                m.artistId.as("m.artistId"),
-                m.memberId,
-                m.memberName,
-                m.instrumental);
 
         return sqlQueryFactory
                 .from(musicFestival.as(mf))
