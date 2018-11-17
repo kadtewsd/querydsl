@@ -22,10 +22,10 @@ repositories {
 }
 dependencies {
 
-    compile('com.querydsl:querydsl-apt:4.1.4')
-    compile('com.querydsl:querydsl-sql:4.1.4')
-    compile('com.querydsl:querydsl-sql-spring:4.1.4')
-    compile('com.querydsl:querydsl-jpa:4.1.4')
+    compile('com.querydsl:querydsl-apt:4.2.1')
+    compile('com.querydsl:querydsl-sql:4.2.1')
+    compile('com.querydsl:querydsl-sql-spring:4.2.1')
+    compile('com.querydsl:querydsl-jpa:4.2.1')
 
 //    compile('org.springframework.boot:spring-boot-starter')
     compile("org.springframework.boot:spring-boot-starter-jdbc")
