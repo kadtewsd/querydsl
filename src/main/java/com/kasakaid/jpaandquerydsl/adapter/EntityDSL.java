@@ -1,4 +1,4 @@
-package com.kasakaid.jpaandquerydsl.repository;
+package com.kasakaid.jpaandquerydsl.adapter;
 
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
 import com.kasakaid.jpaandquerydsl.domain.QMusicFestival;

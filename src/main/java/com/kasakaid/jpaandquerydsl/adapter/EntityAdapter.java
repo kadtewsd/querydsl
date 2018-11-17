@@ -1,4 +1,4 @@
-package com.kasakaid.jpaandquerydsl.repository;
+package com.kasakaid.jpaandquerydsl.adapter;
 
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
 import com.kasakaid.jpaandquerydsl.domain.artist.Artist;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-class ChangeDataToEntity {
+class EntityAdapter {
 
     private final EntityDSL dsl;
 

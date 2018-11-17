@@ -1,4 +1,4 @@
-package com.kasakaid.jpaandquerydsl.repository;
+package com.kasakaid.jpaandquerydsl.adapter;
 
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
 import com.kasakaid.jpaandquerydsl.domain.artist.Artist;
@@ -24,7 +24,7 @@ public class MusicFestivalVariations {
 
     private final SQLQueryFactory sqlQueryFactory;
     private final EntityDSL dsl;
-    private final ChangeDataToEntity change;
+    private final EntityAdapter change;
 
     /**
      * ルートエンティティのみをコンストラクタにて構築する方法

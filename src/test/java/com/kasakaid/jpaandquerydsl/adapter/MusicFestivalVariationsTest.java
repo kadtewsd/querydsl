@@ -1,4 +1,4 @@
-package com.kasakaid.jpaandquerydsl.repository;
+package com.kasakaid.jpaandquerydsl.adapter;
 
 import com.kasakaid.jpaandquerydsl.AbstractBaseTest;
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
@@ -9,8 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 
 public class MusicFestivalVariationsTest extends AbstractBaseTest {
 

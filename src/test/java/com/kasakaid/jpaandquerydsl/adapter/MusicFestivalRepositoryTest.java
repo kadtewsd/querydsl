@@ -1,9 +1,10 @@
-package com.kasakaid.jpaandquerydsl.repository;
+package com.kasakaid.jpaandquerydsl.adapter;
 
 import com.kasakaid.jpaandquerydsl.AbstractBaseTest;
 import com.kasakaid.jpaandquerydsl.Application;
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
 import com.kasakaid.jpaandquerydsl.domain.artist.MemberInformation;
+import com.kasakaid.jpaandquerydsl.repository.NormalJpaRepository;
 import com.kasakaid.jpaandquerydsl.spring.TestConfig;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +18,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.core.Is.is;
 
 @SpringBootTest(classes = {Application.class, TestConfig.class})
 @RunWith(SpringRunner.class)
