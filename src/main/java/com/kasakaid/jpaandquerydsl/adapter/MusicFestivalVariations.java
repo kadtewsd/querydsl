@@ -1,7 +1,6 @@
 package com.kasakaid.jpaandquerydsl.adapter;
 
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
-import com.kasakaid.jpaandquerydsl.domain.artist.Artist;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.MappingProjection;
 import com.querydsl.core.types.Order;
@@ -76,7 +75,7 @@ public class MusicFestivalVariations {
 
                             @Override
                             protected MusicFestival map(Tuple row) {
-                                return musicFestivalMap(row, musicFestivals);
+                                return change.musicFestivalMap(row, musicFestivals);
                             }
                         }
                 )
@@ -98,47 +97,4 @@ public class MusicFestivalVariations {
         return musicFestivals;
     }
 
-    /**
-     * SQL の取得結果を stream を使って、エンティティに組み立てます。
-     * 各エンティティのリストに存在する場合、存在しない場合を書いていくので、
-     * 複雑なストリームになってしまいます。
-     * また、別にイミュータブルにしている訳ではないのでメリットも低いです。
-     * reduce をつかってやるべきなのでしょう。
-     * @param row
-     * @param musicFestivals
-     * @return
-     */
-    MusicFestival musicFestivalMap(Tuple row, List<MusicFestival> musicFestivals) {
-        musicFestivals.stream().filter(x -> x.getFestivalId() == row.get(dsl.mf.festivalId))
-                .map(musicFestival -> {
-                    musicFestival.getArtists().stream()
-                            .filter(artist -> artist.getArtistId() == row.get(dsl.a.artistId))
-                            .map(x1 -> {
-                                // アーティストに新規のメンバーが追加された
-                                x1.getMembers().add(change.memberInformation(row));
-                                return change.memberInformation(row);
-                            })
-                            .findFirst()
-                            .orElseGet(() -> {
-                                // ミュージックフェスティバルに新規のアーティストが追加された
-                                Artist newArtist = change.artist(row);
-                                newArtist.getMembers().add(change.memberInformation(row));
-                                musicFestival.getArtists().add(newArtist);
-                                return change.memberInformation(row);
-                            });
-                    return change.musicFestival(row);
-                })
-                .findFirst()
-                .orElseGet(() -> {
-                    // 新規の音楽フェスティバルが取得された
-                    MusicFestival newMf = change.musicFestival(row);
-                    Artist artist = change.artist(row);
-                    artist.getMembers().add(change.memberInformation(row));
-                    newMf.getArtists().add(artist);
-                    musicFestivals.add(newMf);
-                    return change.musicFestival(row);
-                });
-
-        return change.musicFestival(row);
-    }
 }
