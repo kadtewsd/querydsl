@@ -78,29 +78,6 @@ public class MusicFestivalRepository {
                 ;
     }
 
-    public <T extends Serializable> List<MusicFestival> findMusicFestivalWhereJoin() {
-        log.info("where join");
-        QueryResults<MusicFestival> results = sqlQueryFactory
-                .selectDistinct(
-                        Projections.bean(MusicFestival.class,
-                                mf.festivalId,
-                                mf.festivalName,
-                                mf.eventDate,
-                                mf.place,
-                                a.artistId,
-                                m.memberId,
-                                m.memberName,
-                                m.instrumental
-                        ))
-                .from(musicFestival.as(mf), artist.as(a), member.as(m))
-                .where(mf.festivalId.eq(a.festivalId))
-                .where(a.artistId.eq(m.artistId))
-//                .fetch();
-                .fetchResults();
-//                .getResults().stream().distinct().collect(Collectors.toList());
-        return results.getResults();
-    }
-
     public List<MusicFestival> findMusicFestivalByTransform() {
 
         ConstructorExpression<MemberInformation> memberInformationConstructorExpression = Projections.constructor(MemberInformation.class,

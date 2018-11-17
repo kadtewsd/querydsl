@@ -64,7 +64,7 @@ public class Artist implements Serializable {
     private MusicFestival musicFestival;
 
     @OneToMany(mappedBy = "artist",fetch = FetchType.EAGER)
-    private Set<MemberInformation> members;
+    private Set<MemberInformation> members = new HashSet<>();
 
     void generateMembers() {
         if (this.members == null) {

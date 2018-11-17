@@ -25,9 +25,6 @@ public class MusicFestivalService {
         return musicFestivalRepository.findMusicFestival();
     }
 
-    public <T extends Serializable> List<MusicFestival> findMusicFestivalWhereJoin() {
-        return musicFestivalRepository.findMusicFestivalWhereJoin();
-    }
     public List<MusicFestival> findMusicFestivalByTransform() {
         return musicFestivalRepository.findMusicFestivalByTransform();
     }

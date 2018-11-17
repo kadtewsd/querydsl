@@ -8,6 +8,7 @@ import lombok.*;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class MusicFestival implements Serializable {
     private LocalDate eventDate;
 
     @QueryProjection
-    public MusicFestival(int festivalId, String festivalName, String place, LocalDate eventDate) {
+    public MusicFestival(Integer festivalId, String festivalName, String place, LocalDate eventDate) {
         this.festivalId = festivalId;
         this.festivalName = festivalName;
         this.place = place;
@@ -77,7 +78,7 @@ public class MusicFestival implements Serializable {
     //SqlQueryFactory においても、fetch 属性は影響がある。デフォルトは Lazy になる。
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "musicFestival")
     @OrderBy("festivalId ASC")
-    private List<Artist> artists;
+    private List<Artist> artists = new ArrayList<>();
 
     public void generateArtists() {
         if (this.artists == null) {

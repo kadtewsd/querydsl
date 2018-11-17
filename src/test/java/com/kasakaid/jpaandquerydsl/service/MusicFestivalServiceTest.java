@@ -4,7 +4,6 @@ import com.kasakaid.jpaandquerydsl.AbstractBaseTest;
 import com.kasakaid.jpaandquerydsl.Application;
 import com.kasakaid.jpaandquerydsl.domain.MusicFestival;
 import com.kasakaid.jpaandquerydsl.domain.artist.MemberInformation;
-import com.kasakaid.jpaandquerydsl.repository.NormalJpaRepository;
 import com.kasakaid.jpaandquerydsl.spring.TestConfig;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +17,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.MatcherAssert.*;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 
 @SpringBootTest(classes = {Application.class, TestConfig.class})
@@ -60,13 +58,6 @@ public class MusicFestivalServiceTest extends AbstractBaseTest {
         list.forEach(x -> log.info(x.getFestivalName()));
     }
 
-    @Test
-    public void whereJoinTableTest() {
-        List<MusicFestival> list1 = service.findMusicFestivalWhereJoin();
-        assertThat(list1.get(0).getArtists(), notNullValue());
-        assertThat(list1.size(), is(1));
-        assertThat(list1.get(0).getArtists().size(), greaterThan(0));
-    }
     @Test
     public void findByTransFormTest() {
         List<MusicFestival> list1 = service.findMusicFestivalByTransform();

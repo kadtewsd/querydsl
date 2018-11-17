@@ -34,6 +34,11 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
         myResource.insertData("music_festival");
     }
 
+    /**
+     * 最も細かい粒度となるメンバー数が取得されるレコード数になる。
+     */
+    int japanjam = 7, metrock = 3, rockin = 1;
+
     @Autowired
     private MusicFestivalRepository repository;
     @Autowired
@@ -48,7 +53,7 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
         List<MusicFestival> list = normalJpaRepository.findAll();
         assertThat(list.size(), is(3));
         List<MusicFestival> list0 = jpaMusicFestivalRepository.findMusicFestivalByJPAQuery();
-        assertThat(list0.get(0).getArtists(), notNullValue());
+        assertThat(list0.get(0).getArtists(), nullValue());
         assertThat(list0.get(0).getArtists().size(), greaterThan(0));
         assertThat(list0.size(), is(1));
     }
@@ -63,26 +68,18 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
         assertThat(list0.size(), is(3));
         list.forEach(x -> log.info(x.getFestivalName()));
     }
-
-    @Test
-    public void whereJoinTableTest() {
-        List<MusicFestival> list1 = repository.findMusicFestivalWhereJoin();
-        assertThat(list1.get(0).getArtists(), notNullValue());
-        assertThat(list1.size(), is(1));
-        assertThat(list1.get(0).getArtists().size(), greaterThan(0));
-    }
     @Test
     public void findByTransFormTest() {
         List<MusicFestival> list1 = repository.findMusicFestivalByTransform();
         assertThat(list1.get(0).getArtists(), notNullValue());
-        assertThat(list1.size(), is(3));
+        assertThat(list1.size(), is(allRecords()));
         assertThat(list1.get(0).getArtists().size(), greaterThan(0));
     }
     @Test
     public void findByListTest() {
         List<MusicFestival> list1 = repository.findMusicFestivalByList();
         assertThat(list1.get(0).getArtists(), notNullValue());
-        assertThat(list1.size(), is(3));
+        assertThat(list1.size(), is(japanjam + metrock + rockin));
         assertThat(list1.get(0).getArtists().size(), greaterThan(0));
     }
 
@@ -131,5 +128,9 @@ public class MusicFestivalRepositoryTest extends AbstractBaseTest {
     @Test
     public void testUpdateIndividually() {
         assertThat(dmlRepository.updateFestivalIndividually(), is(2L));
+    }
+
+    int allRecords() {
+        return rockin + metrock + japanjam;
     }
 }
