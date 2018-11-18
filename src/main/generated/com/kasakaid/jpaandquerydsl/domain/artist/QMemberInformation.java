@@ -7,6 +7,9 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.ConstructorExpression;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.PathInits;
 
 
@@ -17,6 +20,10 @@ import com.querydsl.core.types.dsl.PathInits;
 public class QMemberInformation extends EntityPathBase<MemberInformation> {
 
     private static final long serialVersionUID = -575571004L;
+
+    public static ConstructorExpression<MemberInformation> create(Expression<Integer> artistId, Expression<Integer> memberId, Expression<String> memberName, Expression<String> instrumental) {
+        return Projections.constructor(MemberInformation.class, new Class<?>[]{int.class, int.class, String.class, String.class}, artistId, memberId, memberName, instrumental);
+    }
 
     private static final PathInits INITS = PathInits.DIRECT2;
 

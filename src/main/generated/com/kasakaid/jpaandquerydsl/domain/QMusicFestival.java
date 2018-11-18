@@ -7,6 +7,9 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.ConstructorExpression;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.PathInits;
 
 
@@ -17,6 +20,14 @@ import com.querydsl.core.types.dsl.PathInits;
 public class QMusicFestival extends EntityPathBase<MusicFestival> {
 
     private static final long serialVersionUID = 1166941092L;
+
+    public static ConstructorExpression<MusicFestival> create(Expression<Integer> festivalId, Expression<String> festivalName, Expression<String> place, Expression<java.time.LocalDate> eventDate, Expression<? extends com.kasakaid.jpaandquerydsl.domain.artist.Artist> artist, Expression<? extends com.kasakaid.jpaandquerydsl.domain.artist.MemberInformation> memberInformation) {
+        return Projections.constructor(MusicFestival.class, new Class<?>[]{int.class, String.class, String.class, java.time.LocalDate.class, com.kasakaid.jpaandquerydsl.domain.artist.Artist.class, com.kasakaid.jpaandquerydsl.domain.artist.MemberInformation.class}, festivalId, festivalName, place, eventDate, artist, memberInformation);
+    }
+
+    public static ConstructorExpression<MusicFestival> create(Expression<Integer> festivalId, Expression<String> festivalName, Expression<String> place, Expression<java.time.LocalDate> eventDate) {
+        return Projections.constructor(MusicFestival.class, new Class<?>[]{int.class, String.class, String.class, java.time.LocalDate.class}, festivalId, festivalName, place, eventDate);
+    }
 
     public static final QMusicFestival musicFestival = new QMusicFestival("musicFestival");
 

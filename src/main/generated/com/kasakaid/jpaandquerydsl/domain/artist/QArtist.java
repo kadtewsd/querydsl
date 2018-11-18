@@ -7,6 +7,9 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.ConstructorExpression;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.PathInits;
 
 
@@ -17,6 +20,22 @@ import com.querydsl.core.types.dsl.PathInits;
 public class QArtist extends EntityPathBase<Artist> {
 
     private static final long serialVersionUID = -1586038539L;
+
+    public static ConstructorExpression<Artist> create(Expression<Integer> festivalId, Expression<Integer> artistId, Expression<String> artistName, Expression<? extends MemberInformation> memberInformation) {
+        return Projections.constructor(Artist.class, new Class<?>[]{int.class, int.class, String.class, MemberInformation.class}, festivalId, artistId, artistName, memberInformation);
+    }
+
+    public static ConstructorExpression<Artist> create(Expression<Integer> festivalId, Expression<Integer> artistId, Expression<String> artistName) {
+        return Projections.constructor(Artist.class, new Class<?>[]{int.class, int.class, String.class}, festivalId, artistId, artistName);
+    }
+
+    public static ConstructorExpression<Artist> create(NumberExpression<Integer> festivalId, NumberExpression<Integer> artistId, StringExpression artistName, Expression<? extends java.util.Set<MemberInformation>> members) {
+        return Projections.constructor(Artist.class, new Class<?>[]{int.class, int.class, String.class, java.util.Set.class}, festivalId, artistId, artistName, members);
+    }
+
+    public static ConstructorExpression<Artist> create(NumberExpression<Integer> festivalId, NumberExpression<Integer> artistId, StringExpression artistName, com.kasakaid.jpaandquerydsl.domain.QMusicFestival musicFestival) {
+        return Projections.constructor(Artist.class, new Class<?>[]{int.class, int.class, String.class, com.kasakaid.jpaandquerydsl.domain.MusicFestival.class}, festivalId, artistId, artistName, musicFestival);
+    }
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
